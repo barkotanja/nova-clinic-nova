@@ -8,10 +8,17 @@ export default function ScrollExpandHero({ locale, eyebrow, titleA, titleB, body
   const [progress, setProgress] = useState(0);
   const [ready, setReady] = useState(false);
   const [mediaReady, setMediaReady] = useState(false);
+  const [playing, setPlaying] = useState(false);
+  const videoRef = useRef<HTMLVideoElement>(null);
   const progressRef = useRef(0);
   const touchY = useRef(0);
 
   useEffect(() => { progressRef.current = progress; }, [progress]);
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video) return;
+    void video.play().catch(() => setPlaying(false));
+  }, []);
   useEffect(() => {
     if (matchMedia("(prefers-reduced-motion: reduce)").matches) { setProgress(1); setReady(true); return; }
     const update = (delta: number) => {
@@ -38,10 +45,11 @@ export default function ScrollExpandHero({ locale, eyebrow, titleA, titleB, body
     <div className="hero-veil" />
     <div className="hero-kicker"><span>{eyebrow}</span><span>ADDIS ABABA · ET</span></div>
     <div className={`hero-frame ${mediaReady ? "media-ready" : ""}`} style={mediaStyle}>
-      <video autoPlay muted loop playsInline preload="auto" poster="/assets/images/clinic-blue-wall.jpg" onCanPlay={() => setMediaReady(true)} aria-label="Nova Physiotherapy clinic video">
+      <video ref={videoRef} autoPlay muted loop playsInline preload="auto" poster="/assets/images/clinic-blue-wall.jpg" onLoadedData={() => setMediaReady(true)} onCanPlay={() => setMediaReady(true)} onPlay={() => setPlaying(true)} onPause={() => setPlaying(false)} aria-label="Nova Physiotherapy clinic video">
         <source src="/assets/videos/nova-hero.mp4" type="video/mp4" />
       </video>
       {!mediaReady && <div className="hero-video-loading" aria-hidden="true" />}
+      {!playing && <button className="hero-video-play" type="button" onClick={() => void videoRef.current?.play()} aria-label="Play Nova clinic video"><span>PLAY VIDEO</span><b>▶</b></button>}
       <div className="hero-video-overlay" />
       <div className="hero-frame-label"><span>PHYSIOTHERAPY · REIMAGINED</span><b>01</b></div>
     </div>
