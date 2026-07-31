@@ -7,6 +7,7 @@ type Props = { locale: "en" | "am"; eyebrow: string; titleA: string; titleB: str
 export default function ScrollExpandHero({ locale, eyebrow, titleA, titleB, body, book, inquiry, call, phoneHref }: Props) {
   const [progress, setProgress] = useState(0);
   const [ready, setReady] = useState(false);
+  const [mediaReady, setMediaReady] = useState(false);
   const progressRef = useRef(0);
   const touchY = useRef(0);
 
@@ -36,8 +37,11 @@ export default function ScrollExpandHero({ locale, eyebrow, titleA, titleB, body
     <div className="hero-backdrop" style={{ opacity: 1 - progress * .9 }}><img src="/assets/images/nova-team-hero.png" alt="Nova Physiotherapy care team" /></div>
     <div className="hero-veil" />
     <div className="hero-kicker"><span>{eyebrow}</span><span>ADDIS ABABA · ET</span></div>
-    <div className="hero-frame" style={mediaStyle}>
-      <video autoPlay muted loop playsInline preload="metadata" poster="/assets/images/nova-team-hero.png"><source src="/assets/videos/nova-hero.mp4" type="video/mp4" /></video>
+    <div className={`hero-frame ${mediaReady ? "media-ready" : ""}`} style={mediaStyle}>
+      <video autoPlay muted loop playsInline preload="auto" poster="/assets/images/clinic-blue-wall.jpg" onCanPlay={() => setMediaReady(true)} aria-label="Nova Physiotherapy clinic video">
+        <source src="/assets/videos/nova-hero.mp4" type="video/mp4" />
+      </video>
+      {!mediaReady && <div className="hero-video-loading" aria-hidden="true" />}
       <div className="hero-video-overlay" />
       <div className="hero-frame-label"><span>PHYSIOTHERAPY · REIMAGINED</span><b>01</b></div>
     </div>
